@@ -9,14 +9,23 @@ import { Langfuse } from "langfuse";
 import { config } from "dotenv";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
+import os from "os";
 import { generateTraceName, generateSessionId, generateTags } from "./utils.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Load .env from project root (3 levels up from lib/)
+// Load env in priority order:
+// 1) Global Cursor env (~/.cursor/.env) so you can install once for all projects
+// 2) Project root .env (3 levels up from lib/)
+// 3) CWD .env (fallback)
+const globalCursorEnvPath = resolve(os.homedir(), ".cursor", ".env");
+config({ path: globalCursorEnvPath });
+
 const projectRoot = resolve(__dirname, "..", "..", "..");
-config({ path: resolve(projectRoot, ".env") });
+if (!process.env.LANGFUSE_SECRET_KEY) {
+  config({ path: resolve(projectRoot, ".env") });
+}
 
 // Fallback: try CWD if keys not found
 if (!process.env.LANGFUSE_SECRET_KEY) {

@@ -43,6 +43,8 @@ This project enables automatic tracing of Cursor AI agent activity to Langfuse. 
 
 ## Installation
 
+### Per-project install (current setup)
+
 1. Clone or copy this repository to your project directory.
 
 2. Install dependencies:
@@ -61,6 +63,84 @@ LANGFUSE_BASE_URL=https://cloud.langfuse.com
 ```
 
 4. The hooks configuration (`.cursor/hooks.json`) is already set up to route all hooks through the handler.
+
+### Install once globally (recommended)
+
+This avoids running `npm install` in every repository.
+
+1. Create a global hooks folder and copy the hook runtime there:
+
+```bash
+mkdir -p ~/.cursor/hooks/langfuse
+cp -R .cursor/hooks/* ~/.cursor/hooks/langfuse/
+cd ~/.cursor/hooks/langfuse
+npm install
+```
+
+2. Put your Langfuse credentials in `~/.cursor/.env`:
+
+```env
+LANGFUSE_SECRET_KEY=sk-lf-...
+LANGFUSE_PUBLIC_KEY=pk-lf-...
+LANGFUSE_BASE_URL=https://cloud.langfuse.com
+```
+
+3. In each project, create `.cursor/hooks.json` that points at the global handler:
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "beforeSubmitPrompt": [{ "command": "node ~/.cursor/hooks/langfuse/hook-handler.js" }],
+    "afterAgentResponse": [{ "command": "node ~/.cursor/hooks/langfuse/hook-handler.js" }],
+    "afterAgentThought": [{ "command": "node ~/.cursor/hooks/langfuse/hook-handler.js" }],
+    "beforeShellExecution": [{ "command": "node ~/.cursor/hooks/langfuse/hook-handler.js" }],
+    "afterShellExecution": [{ "command": "node ~/.cursor/hooks/langfuse/hook-handler.js" }],
+    "beforeMCPExecution": [{ "command": "node ~/.cursor/hooks/langfuse/hook-handler.js" }],
+    "afterMCPExecution": [{ "command": "node ~/.cursor/hooks/langfuse/hook-handler.js" }],
+    "beforeReadFile": [{ "command": "node ~/.cursor/hooks/langfuse/hook-handler.js" }],
+    "afterFileEdit": [{ "command": "node ~/.cursor/hooks/langfuse/hook-handler.js" }],
+    "stop": [{ "command": "node ~/.cursor/hooks/langfuse/hook-handler.js" }],
+    "beforeTabFileRead": [{ "command": "node ~/.cursor/hooks/langfuse/hook-handler.js" }],
+    "afterTabFileEdit": [{ "command": "node ~/.cursor/hooks/langfuse/hook-handler.js" }]
+  }
+}
+```
+
+## One command per project (recommended)
+
+This repository includes a tiny CLI that lets you:
+
+- install/update the global hook runtime once
+- enable hooks in any repo with a single command
+
+### Install the CLI once
+
+From this repository:
+
+```bash
+npm install -g .
+```
+
+### Install/update the global runtime once
+
+```bash
+cursor-langfuse-hooks install-global --from /path/to/this/repo
+```
+
+### Enable hooks in any project
+
+Run this inside the target repo:
+
+```bash
+cursor-langfuse-hooks init
+```
+
+### Troubleshoot
+
+```bash
+cursor-langfuse-hooks doctor
+```
 
 ## Configuration
 

@@ -1,0 +1,9 @@
+{
+  "name": "cursor-langfuse-hooks-cli",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "cursor-langfuse-hooks": "./bin/cursor-langfuse-hooks.mjs"
+  }
+}
